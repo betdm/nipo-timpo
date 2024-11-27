@@ -50,7 +50,10 @@ def generate_codes():
         count = int(request.form['count'])
         success = []
         failed = []
-        
+
+        if count <= 0:
+            return jsonify({'status': 'error', 'message': 'Please enter a positive number of codes to generate.'})
+
         for _ in range(count):
             code = generate_code()
             if send_code_to_webhook(code):
