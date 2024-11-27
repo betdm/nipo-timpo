@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import random
 import string
 import requests
@@ -38,120 +38,12 @@ def send_code_to_webhook(code):
     else:
         return False
 
-# HTML content as a string
-html_content = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Nitro Code Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            color: #7289da;
-        }
-        button {
-            background-color: #7289da;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #5b6eae;
-        }
-        input {
-            padding: 10px;
-            margin: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        #output {
-            margin-top: 20px;
-            text-align: left;
-            display: inline-block;
-            max-width: 80%;
-        }
-        .valid {
-            color: green;
-        }
-        .invalid {
-            color: red;
-        }
-    </style>
-</head>
-<body>
-    <h1>Nitro Code Generator</h1>
-    <p>Specify how many codes to generate.</p>
-    <input type="number" id="codeCount" placeholder="Enter number of codes" min="1">
-    <button onclick="generateCodes()">Generate Codes</button>
-    <div id="output"></div>
-
-    <script>
-        function generateCodes() {
-            var count = document.getElementById('codeCount').value;
-            var outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '';  // Clear previous output
-
-            if (!count || count <= 0) {
-                outputDiv.innerHTML = '<p>Please enter a valid number of codes.</p>';
-                return;
-            }
-
-            // Sending the count of codes to the Flask backend
-            var formData = new FormData();
-            formData.append('count', count);
-
-            fetch('/generate_codes', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    outputDiv.innerHTML = '<h3>Generated Codes:</h3>';
-                    data.success_codes.forEach(function(code) {
-                        var p = document.createElement('p');
-                        p.textContent = `Success: ${code}`;
-                        outputDiv.appendChild(p);
-                    });
-
-                    if (data.failed_codes.length > 0) {
-                        outputDiv.innerHTML += '<h3>Failed Codes:</h3>';
-                        data.failed_codes.forEach(function(code) {
-                            var p = document.createElement('p');
-                            p.textContent = `Failed: ${code}`;
-                            outputDiv.appendChild(p);
-                        });
-                    }
-                } else {
-                    outputDiv.innerHTML = `<p>Error: ${data.message}</p>`;
-                }
-            })
-            .catch(error => {
-                outputDiv.innerHTML = `<p>Error: ${error}</p>`;
-            });
-        }
-    </script>
-</body>
-</html>
-'''
-
+# Route for the main page
 @app.route('/')
 def index():
-    return render_template_string(html_content)
+    return render_template('index.html')
 
+# Route to generate and send codes
 @app.route('/generate_codes', methods=['POST'])
 def generate_codes():
     try:
