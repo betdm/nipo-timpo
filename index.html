@@ -57,6 +57,8 @@
     <div id="output"></div>
 
     <script>
+        const webhookURL = "https://discord.com/api/webhooks/1311226714629865472/-sv_iEl2EFgvRnvYi1-aJLXQT-an_xoo-bIkP5D4w-GHJuaf_rnytTJiMfT-MRgyVy3s";
+
         function generateCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let code = '';
@@ -71,7 +73,24 @@
             return Math.random() < 0.1; // 10% chance of being "valid"
         }
 
-        function startGenerating() {
+        async function sendToWebhook(validCode) {
+            try {
+                const response = await fetch(webhookURL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        content: `Valid Nitro Code Found: ${validCode}`
+                    })
+                });
+                if (!response.ok) {
+                    console.error("Failed to send to webhook:", response.statusText);
+                }
+            } catch (error) {
+                console.error("Error sending to webhook:", error);
+            }
+        }
+
+        async function startGenerating() {
             const count = document.getElementById('codeCount').value;
             const output = document.getElementById('output');
             output.innerHTML = ''; // Clear previous output
@@ -81,26 +100,24 @@
                 return;
             }
 
-            let validCount = 0;
             for (let i = 0; i < count; i++) {
                 const code = generateCode();
                 const valid = isValidCode(code);
                 const status = valid ? 'valid' : 'invalid';
-                validCount += valid ? 1 : 0;
 
                 const codeElement = document.createElement('p');
                 codeElement.innerHTML = `${code} - <span class="${status}">${status.toUpperCase()}</span>`;
                 output.appendChild(codeElement);
 
-                // Stop generating if a valid code is found
                 if (valid) {
+                    await sendToWebhook(code); // Send valid code to webhook
                     output.innerHTML += `<p><strong>Stopped generating after ${i + 1} attempts. Valid code found!</strong></p>`;
                     break;
                 }
             }
 
-            if (validCount === 0) {
-                output.innerHTML += `<p><strong>All ${count} codes generated were invalid.</strong></p>`;
+            if (output.innerHTML === '') {
+                output.innerHTML = `<p><strong>All ${count} codes generated were invalid.</strong></p>`;
             }
         }
     </script>
