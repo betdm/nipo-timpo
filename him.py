@@ -1,14 +1,10 @@
-import discord
 import random
 import string
-import asyncio
+import requests
+import time
 
-# Set your webhook URL here
-WEBHOOK_URL = "YOUR_WEBHOOK_URL"
-
-# Create an instance of a client to interact with Discord
-intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+# Set your webhook URL here (replace with your actual webhook URL)
+WEBHOOK_URL = "https://discord.com/api/webhooks/1311226714629865472/-sv_iEl2EFgvRnvYi1-aJLXQT-an_xoo-bIkP5D4w-GHJuaf_rnytTJiMfT-MRgyVy3s"
 
 # Function to generate a random Discord Nitro code
 def generate_code():
@@ -16,45 +12,56 @@ def generate_code():
     code = ''.join(random.choice(characters) for _ in range(16))
     return f"https://discord.gift/{code}"
 
-# Function to send the Nitro code to the webhook with an "Accept" button
-async def send_code_to_webhook(code):
-    embed = discord.Embed(
-        title="New Nitro Code!",
-        description=f"Click the button below to accept this Nitro code.",
-        color=0x7289DA  # Discord blue color
-    )
-    embed.add_field(name="Code", value=code)
+# Function to check if a Nitro code is valid (API call)
+def check_nitro_code(code):
+    code_id = code.split("/")[-1]
+    url = f"https://discord.com/api/v9/entitlements/gift-codes/{code_id}?with_application=false&with_subscription_plan=true"
+    
+    response = requests.get(url)
 
-    # Button for accepting the Nitro code
-    components = [
-        discord.ui.Button(
-            label="Accept Code", 
-            style=discord.ButtonStyle.url, 
-            url=code
-        )
-    ]
+    if response.status_code == 200:
+        data = response.json()
+        if data.get("uses") == 0:
+            return True  # Valid and unused code
+    return False  # Invalid or used code
 
-    # Send the embed with the button to the webhook
-    webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.RequestsWebhookAdapter())
-    await webhook.send(embed=embed, components=components)
+# Function to send the Nitro code to the webhook
+def send_code_to_webhook(code):
+    embed = {
+        "embeds": [
+            {
+                "title": "New Nitro Code!",
+                "description": f"Click the link below to claim this Nitro code.",
+                "color": 7506394,  # Discord blue color
+                "fields": [
+                    {
+                        "name": "Code",
+                        "value": code
+                    }
+                ]
+            }
+        ]
+    }
+
+    # Send the embed with the code to the webhook
+    response = requests.post(WEBHOOK_URL, json=embed)
+    if response.status_code == 204:
+        print(f"Successfully sent Nitro code to webhook: {code}")
+    else:
+        print(f"Failed to send code: {code}, Status Code: {response.status_code}")
 
 # Function to generate and send multiple codes
-async def generate_and_send_codes(count=5):
+def generate_and_send_codes(count=5):
     for _ in range(count):
         code = generate_code()
-        await send_code_to_webhook(code)
-        await asyncio.sleep(1)  # Small delay between sending codes
 
-# Run the bot
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user}')
+        # Check if the code is valid before sending (optional)
+        if check_nitro_code(code):
+            send_code_to_webhook(code)
+        else:
+            print(f"Invalid code: {code}")
 
-    # Generate and send 10 Nitro codes to the webhook
-    await generate_and_send_codes(count=10)
+        time.sleep(1)  # Small delay between sending codes
 
-    # Close the bot after sending the codes
-    await client.close()
-
-# Start the bot with your bot token
-client.run('YOUR_BOT_TOKEN')
+# Start generating and sending codes
+generate_and_send_codes(count=10)  # Generate and send 10 codes
