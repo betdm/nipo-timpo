@@ -28,19 +28,33 @@
         button:hover {
             background-color: #5b6eae;
         }
-        #code {
+        input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #output {
             margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c2f33;
+            text-align: left;
+            display: inline-block;
+            max-width: 80%;
+        }
+        .valid {
+            color: green;
+        }
+        .invalid {
+            color: red;
         }
     </style>
 </head>
 <body>
     <h1>Nitro Code Generator</h1>
-    <p>Click the button below to generate a random Nitro code link.</p>
-    <button onclick="generateCode()">Generate Code</button>
-    <div id="code"></div>
+    <p>Specify the number of Nitro codes to generate and test their validity.</p>
+    <input type="number" id="codeCount" placeholder="Enter number of codes" min="1">
+    <button onclick="startGenerating()">Start Generating</button>
+    <div id="output"></div>
 
     <script>
         function generateCode() {
@@ -49,8 +63,45 @@
             for (let i = 0; i < 16; i++) {
                 code += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            const nitroLink = `https://discord.gift/${code}`;
-            document.getElementById('code').innerText = nitroLink;
+            return `https://discord.gift/${code}`;
+        }
+
+        function isValidCode(code) {
+            // Simulate a validation check
+            return Math.random() < 0.1; // 10% chance of being "valid"
+        }
+
+        function startGenerating() {
+            const count = document.getElementById('codeCount').value;
+            const output = document.getElementById('output');
+            output.innerHTML = ''; // Clear previous output
+
+            if (!count || count <= 0) {
+                output.innerHTML = '<p>Please enter a valid number of codes.</p>';
+                return;
+            }
+
+            let validCount = 0;
+            for (let i = 0; i < count; i++) {
+                const code = generateCode();
+                const valid = isValidCode(code);
+                const status = valid ? 'valid' : 'invalid';
+                validCount += valid ? 1 : 0;
+
+                const codeElement = document.createElement('p');
+                codeElement.innerHTML = `${code} - <span class="${status}">${status.toUpperCase()}</span>`;
+                output.appendChild(codeElement);
+
+                // Stop generating if a valid code is found
+                if (valid) {
+                    output.innerHTML += `<p><strong>Stopped generating after ${i + 1} attempts. Valid code found!</strong></p>`;
+                    break;
+                }
+            }
+
+            if (validCount === 0) {
+                output.innerHTML += `<p><strong>All ${count} codes generated were invalid.</strong></p>`;
+            }
         }
     </script>
 </body>
