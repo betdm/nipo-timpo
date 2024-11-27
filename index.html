@@ -3,66 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nitro Code Generator</title>
+    <title>Discord Nitro Code Generator</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #7289da, #99aab5);
-            color: #ffffff;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
             text-align: center;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            background: #2c2f33;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 400px;
         }
         h1 {
-            margin-bottom: 20px;
             color: #7289da;
-        }
-        input {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #99aab5;
-            border-radius: 5px;
-            font-size: 16px;
         }
         button {
             background-color: #7289da;
             color: white;
             border: none;
             padding: 10px 20px;
+            margin-top: 20px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #5b6eae;
         }
-        .output {
+        input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #output {
             margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Nitro Code Generator</h1>
-        <p>Enter the number of codes to generate:</p>
-        <input type="number" id="codeCount" placeholder="Enter number of codes" min="1">
-        <button onclick="generateCodes()">Generate & Send</button>
-        <div class="output" id="output"></div>
-    </div>
+    <h1>Discord Nitro Code Generator</h1>
+    <p>Enter the number of codes to generate and send to the Discord webhook.</p>
+    <input type="number" id="codeCount" placeholder="Number of Codes" min="1">
+    <button onclick="generateCodes()">Generate & Send</button>
+    <div id="output"></div>
 
     <script>
         async function generateCodes() {
@@ -85,10 +69,15 @@
                 });
 
                 const result = await response.json();
-                output.innerHTML = result.message || "An error occurred.";
+                if (response.ok) {
+                    output.innerHTML = `<p>${result.message}</p>`;
+                } else {
+                    output.innerHTML = `<p>Error: ${result.message}</p>`;
+                    console.error("Backend Error:", result.error || result);
+                }
             } catch (error) {
-                console.error("Error:", error);
-                output.innerHTML = "Failed to send codes.";
+                console.error("Request Error:", error);
+                output.innerHTML = "Failed to send codes. Please try again.";
             }
         }
     </script>
