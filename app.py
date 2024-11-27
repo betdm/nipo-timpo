@@ -6,7 +6,7 @@ import requests
 app = Flask(__name__)
 
 # Set your webhook URL here (replace with your actual webhook URL)
-WEBHOOK_URL = "YOUR_WEBHOOK_URL"
+WEBHOOK_URL = "https://discord.com/api/webhooks/1311226714629865472/-sv_iEl2EFgvRnvYi1-aJLXQT-an_xoo-bIkP5D4w-GHJuaf_rnytTJiMfT-MRgyVy3s"
 
 # Function to generate a random Discord Nitro code
 def generate_code():
