@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Nitro Code Generator</title>
+    <title>Nitro Code Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,11 +13,11 @@
             padding: 20px;
         }
         h1 {
-            color: #7289da;
+            color: #0057d9; /* Improved contrast */
         }
         button {
-            background-color: #7289da;
-            color: white;
+            background-color: #0057d9; /* Improved contrast */
+            color: #ffffff;
             border: none;
             padding: 10px 20px;
             margin-top: 20px;
@@ -26,7 +26,7 @@
             border-radius: 5px;
         }
         button:hover {
-            background-color: #5b6eae;
+            background-color: #003a91; /* Improved contrast */
         }
         input {
             padding: 10px;
@@ -50,55 +50,25 @@
     <button onclick="generateCodes()">Generate Codes</button>
     <div id="output"></div>
 
-<script>
-    function generateCodes() {
-        var count = document.getElementById('codeCount').value;
-        var outputDiv = document.getElementById('output');
-        outputDiv.innerHTML = '';  // Clear previous output
+    <script>
+        function generateCodes() {
+            const count = document.getElementById('codeCount').value;
+            const output = document.getElementById('output');
+            output.innerHTML = ''; // Clear previous output
 
-        if (!count || count <= 0) {
-            outputDiv.innerHTML = '<p>Please enter a valid number of codes.</p>';
-            return;
-        }
-
-        // Sending the count of codes to the Flask backend
-        var formData = new FormData();
-        formData.append('count', count);
-
-        fetch('/generate_codes', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            // Ensure the response is JSON
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                outputDiv.innerHTML = '<h3>Generated Codes:</h3>';
-                data.success_codes.forEach(function(code) {
-                    var p = document.createElement('p');
-                    p.textContent = `Success: ${code}`;
-                    outputDiv.appendChild(p);
-                });
-
-                if (data.failed_codes.length > 0) {
-                    outputDiv.innerHTML += '<h3>Failed Codes:</h3>';
-                    data.failed_codes.forEach(function(code) {
-                        var p = document.createElement('p');
-                        p.textContent = `Failed: ${code}`;
-                        outputDiv.appendChild(p);
-                    });
-                }
-            } else {
-                outputDiv.innerHTML = `<p>Error: ${data.message}</p>`;
+            if (!count || count <= 0) {
+                output.innerHTML = '<p>Please enter a valid number of codes.</p>';
+                return;
             }
-        })
-        .catch(error => {
-            outputDiv.innerHTML = `<p>Error: ${error}</p>`;
-        });
-    }
-</script>
 
+            // Simulate code generation
+            for (let i = 0; i < count; i++) {
+                const code = `https://discord.gift/${Math.random().toString(36).substr(2, 16)}`;
+                const p = document.createElement('p');
+                p.textContent = code;
+                output.appendChild(p);
+            }
+        }
+    </script>
 </body>
 </html>
