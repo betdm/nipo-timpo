@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nitro Code Generator</title>
+    <title>Discord Nitro Code Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,14 +51,12 @@
 </head>
 <body>
     <h1>Nitro Code Generator</h1>
-    <p>Specify the number of Nitro codes to generate and test their validity.</p>
+    <p>Specify how many codes to generate. Claimable codes require manual validation.</p>
     <input type="number" id="codeCount" placeholder="Enter number of codes" min="1">
-    <button onclick="startGenerating()">Start Generating</button>
+    <button onclick="startGenerating()">Generate Codes</button>
     <div id="output"></div>
 
     <script>
-        const webhookURL = "https://discord.com/api/webhooks/1311226714629865472/-sv_iEl2EFgvRnvYi1-aJLXQT-an_xoo-bIkP5D4w-GHJuaf_rnytTJiMfT-MRgyVy3s";
-
         function generateCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let code = '';
@@ -68,26 +66,13 @@
             return `https://discord.gift/${code}`;
         }
 
-        function isValidCode(code) {
-            // Simulate a validation check
-            return Math.random() < 0.001; // 10% chance of being "valid"
-        }
-
-        async function sendToWebhook(validCode) {
-            try {
-                const response = await fetch(webhookURL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        content: `Valid Nitro Code Found: ${validCode}`
-                    })
-                });
-                if (!response.ok) {
-                    console.error("Failed to send to webhook:", response.statusText);
-                }
-            } catch (error) {
-                console.error("Error sending to webhook:", error);
-            }
+        async function checkIfValid(code) {
+            // Placeholder for API call to validate codes
+            // Example for education purposes only:
+            // const response = await fetch(`https://discord.com/api/v9/entitlements/gift-codes/${code.split('/').pop()}?with_application=false&with_subscription_plan=true`);
+            // const data = await response.json();
+            // return data.uses === 0;
+            return Math.random() < 0.1; // Simulate validity (10% chance)
         }
 
         async function startGenerating() {
@@ -102,7 +87,7 @@
 
             for (let i = 0; i < count; i++) {
                 const code = generateCode();
-                const valid = isValidCode(code);
+                const valid = await checkIfValid(code); // Placeholder for real validation logic
                 const status = valid ? 'valid' : 'invalid';
 
                 const codeElement = document.createElement('p');
@@ -110,8 +95,7 @@
                 output.appendChild(codeElement);
 
                 if (valid) {
-                    await sendToWebhook(code); // Send valid code to webhook
-                    output.innerHTML += `<p><strong>Stopped generating after ${i + 1} attempts. Valid code found!</strong></p>`;
+                    output.innerHTML += `<p><strong>Stopped generating after ${i + 1} attempts. Claimable code found!</strong></p>`;
                     break;
                 }
             }
