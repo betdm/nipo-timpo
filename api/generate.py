@@ -6,8 +6,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # Replace with your Discord webhook URL
-WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"
-
+WEBHOOK_URL = "https://discord.com/api/webhooks/1311226714629865472/-sv_iEl2EFgvRnvYi1-aJLXQT-an_xoo-bIkP5D4w-GHJuaf_rnytTJiMfT-MRgyVy3s"
 # Function to generate a random Nitro code
 def generate_code():
     characters = string.ascii_letters + string.digits
